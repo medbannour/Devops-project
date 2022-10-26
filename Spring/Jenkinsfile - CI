@@ -1,0 +1,59 @@
+pipeline{
+    agent any
+    tools {
+        maven 'Maven'
+    }
+    stages{
+        stage('Getting code from git'){
+            steps{
+            echo 'pulling ...';
+            git branch: 'main',
+            url : 'https://github.com/yassinebenamor/Devops-project.git'
+            }
+        }
+        stage('Cleaning'){
+            steps{
+            echo 'cleaning';
+            sh 'mvn clean -DskipTests=true';
+            }
+        }
+        stage('Compiling the code'){
+            steps{
+            echo 'compilling';
+            sh 'mvn compile -DskipTests=true';
+            }
+        }
+        stage('Lancer les tests unitaires'){
+            steps{
+            echo 'Tests unitaires'
+            sh "mvn test"
+            }
+        }
+
+        stage('SonarQube'){
+            steps{
+            withSonarQubeEnv('sonarqube-8.9.7') {
+                echo "Sonar"
+                sh "mvn sonar:sonar -Dsonar.login=d4c701c457b1566449aa7b4ee3a8081cd778763c -DskipTests"
+                }
+            }
+        }
+        stage('Nexus')
+        {
+            steps{
+                echo "nexus"
+                 sh 'mvn clean deploy -DskipTests'
+            }
+        }
+    }
+    post{
+        success{
+            slackSend channel: '#dev',
+            message: "Validation - Build # ${env.BUILD_NUMBER} - Success"
+        }
+        failure{
+            slackSend channel: '#dev',
+            message: "Validation - Build # ${env.BUILD_NUMBER} - Failed"
+        }
+    }
+}

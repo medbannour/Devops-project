@@ -1,0 +1,52 @@
+pipeline{
+    agent any
+    tools {
+        maven 'Maven' 
+    }
+    stages{
+        stage('Getting spring from git'){
+            steps{
+            echo 'pulling ...';
+            git branch: 'main',
+            url : 'https://github.com/yassinebenamor/Devops-project.git'
+            }
+        }
+        stage('Cleaning'){
+            steps{
+            echo 'cleaning';
+            sh 'mvn clean -DskipTests=true';
+     
+            }
+        }
+        stage('Genering the jar'){
+            steps{
+            echo 'Genering the jar';
+            sh 'mvn package -DskipTests=true';
+            }
+        }
+        stage('Creating image spring'){
+            steps{
+            echo 'Creating image';
+            sh 'docker build -t yassinebenamor/tpachatproject:latest .';
+            }
+        }
+        
+        stage('Login'){
+            steps{
+              sh 'docker login -u yassinebenamor --password dckr_pat_p3Nz5se5OQdk1MDa1SLYoNyiqgQ'
+            }
+        }
+        stage('Pushing spring to dockerhub'){
+            steps{
+            echo 'Pushing to dockerhub';
+             sh 'docker push yassinebenamor/tpachatproject:latest';
+            }
+        }
+    }
+    post{
+        always{
+            sh'docker logout'
+        }
+    }
+
+}
