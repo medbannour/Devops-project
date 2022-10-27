@@ -9,25 +9,26 @@ pipeline{
             echo 'pulling ...';
             git branch: 'main',
             url : 'https://github.com/yassinebenamor/Devops-project.git'
+            sh'ls'
             }
         }
         stage('Cleaning'){
             steps{
             echo 'cleaning';
-            sh 'mvn clean -DskipTests=true';
+            sh 'cd Spring && mvn clean -DskipTests=true';
      
             }
         }
         stage('Genering the jar'){
             steps{
             echo 'Genering the jar';
-            sh 'mvn package -DskipTests=true';
+            sh 'cd Spring && mvn package -DskipTests=true';
             }
         }
         stage('Creating image spring'){
             steps{
             echo 'Creating image';
-            sh 'docker build -t yassinebenamor/tpachatproject:latest .';
+            sh 'cd Spring && docker build -t yassinebenamor/tpachatproject:latest .';
             }
         }
         
