@@ -14,19 +14,19 @@ pipeline{
         stage('Cleaning'){
             steps{
             echo 'cleaning';
-            sh 'mvn clean -DskipTests=true';
+            sh 'cd Spring && mvn clean -DskipTests=true';
             }
         }
         stage('Compiling the code'){
             steps{
             echo 'compilling';
-            sh 'mvn compile -DskipTests=true';
+            sh 'cd Spring && mvn compile -DskipTests=true';
             }
         }
         stage('Lancer les tests unitaires'){
             steps{
             echo 'Tests unitaires'
-            sh "mvn test"
+            sh "cd Spring && mvn test"
             }
         }
 
@@ -34,7 +34,7 @@ pipeline{
             steps{
             withSonarQubeEnv('sonarqube-8.9.7') {
                 echo "Sonar"
-                sh "mvn sonar:sonar -Dsonar.login=d4c701c457b1566449aa7b4ee3a8081cd778763c -DskipTests"
+                sh "cd Spring && mvn sonar:sonar -Dsonar.login=d4c701c457b1566449aa7b4ee3a8081cd778763c -DskipTests"
                 }
             }
         }
@@ -42,7 +42,7 @@ pipeline{
         {
             steps{
                 echo "nexus"
-                 sh 'mvn clean deploy -DskipTests'
+                 sh 'cd Spring && mvn clean deploy -DskipTests'
             }
         }
     }
